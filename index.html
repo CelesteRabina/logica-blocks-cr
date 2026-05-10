@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>LogicaBlocks — Pensamiento Computacional</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F5F3EE;
+    --surface: #FFFFFF;
+    --surface2: #EDEBE6;
+    --border: #D8D4CC;
+    --text: #1C1A17;
+    --text-muted: #7A7670;
+    --accent: #2D5BE3;
+    --accent-light: #EAF0FF;
+    --green: #1A7A4A;
+    --green-light: #E6F4ED;
+    --amber: #C47800;
+    --amber-light: #FFF3DC;
+    --red: #C0392B;
+    --red-light: #FDECEA;
+    --purple: #6B3FA0;
+    --purple-light: #F2ECFA;
+    --teal: #1A7A6A;
+    --teal-light: #E6F4F2;
+
+    --block-leer: #2D5BE3;
+    --block-escribir: #1A7A4A;
+    --block-asignar: #C47800;
+    --block-si: #6B3FA0;
+    --block-repetir: #1A7A6A;
+
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--border);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+  .help-btn {
+    background: var(--surface2);
+    border: none;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ── SECTION TITLES ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  /* ── BLOCK PALETTE ── */
+  .palette {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+  .palette-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    text-align: left;
+    background: var(--surface);
+  }
+  .add-btn:active { transform: scale(0.97); }
+  .add-btn .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .btn-leer   { border-color: var(--block-leer);   color: var(--block-leer);   background: var(--accent-light); }
+  .btn-escribir{ border-color: var(--block-escribir); color: var(--block-escribir); background: var(--green-light); }
+  .btn-asignar { border-color: var(--block-asignar); color: var(--block-asignar); background: var(--amber-light); }
+  .btn-si      { border-color: var(--block-si);     color: var(--block-si);     background: var(--purple-light); }
+  .btn-repetir { border-color: var(--block-repetir); color: var(--block-repetir); background: var(--teal-light); }
+
+  .btn-leer .dot   { background: var(--block-leer); }
+  .btn-escribir .dot{ background: var(--block-escribir); }
+  .btn-asignar .dot { background: var(--block-asignar); }
+  .btn-si .dot      { background: var(--block-si); }
+  .btn-repetir .dot { background: var(--block-repetir); }
+
+  /* ── PROGRAM AREA ── */
+  .program-area {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    min-height: 120px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 28px 16px;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .empty-icon { font-size: 28px; opacity: 0.4; }
+
+  #blocks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* ── INDIVIDUAL BLOCK ── */
+  .block {
+    border-radius: var(--radius-sm);
+    border-left: 4px solid;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .block-leer     { border-color: var(--block-leer);     background: var(--accent-light); }
+  .block-escribir { border-color: var(--block-escribir); background: var(--green-light); }
+  .block-asignar  { border-color: var(--block-asignar);  background: var(--amber-light); }
+  .block-si       { border-color: var(--block-si);       background: var(--purple-light); }
+  .block-repetir  { border-color: var(--block-repetir);  background: var(--teal-light); }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px 6px;
+  }
+  .block-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .block-leer     .block-title { color: var(--block-leer); }
+  .block-escribir .block-title { color: var(--block-escribir); }
+  .block-asignar  .block-title { color: var(--block-asignar); }
+  .block-si       .block-title { color: var(--block-si); }
+  .block-repetir  .block-title { color: var(--block-repetir); }
+
+  .block-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .block-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: opacity 0.1s;
+  }
+  .block-action-btn:active { opacity: 1; }
+
+  .block-body {
+    padding: 0 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .field-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+  .field-input {
+    flex: 1;
+    min-width: 100px;
+    background: rgba(255,255,255,0.8);
+    border: 1.5px solid rgba(0,0,0,0.1);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { border-color: rgba(0,0,0,0.3); background: white; }
+  .field-input::placeholder { color: var(--text-muted); font-style: italic; opacity: 0.7; }
+
+  /* SI block extra */
+  .si-then-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--block-si);
+    margin-top: 4px;
+  }
+
+  /* ── ACTION BAR ── */
+  .action-bar {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-clear {
+    flex: 1;
+    padding: 14px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-clear:active { background: var(--border); }
+
+  .btn-run {
+    flex: 2;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 10px rgba(45, 91, 227, 0.3);
+    letter-spacing: 0.1px;
+  }
+  .btn-run:active { transform: scale(0.98); box-shadow: none; }
+
+  /* ── CONSOLE (fullscreen overlay) ── */
+  .console {
+    position: fixed;
+    inset: 0;
+    background: #1C1A17;
+    z-index: 150;
+    display: none;
+    flex-direction: column;
+  }
+  .console.visible { display: flex; }
+  .console-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #2E2C28;
+    flex-shrink: 0;
+  }
+  .console-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #7A7670;
+  }
+  .console-actions { display: flex; gap: 8px; align-items: center; }
+  .console-clear {
+    background: none;
+    border: none;
+    color: #7A7670;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    padding: 2px 6px;
+  }
+  .console-close {
+    background: #2E2C28;
+    border: none;
+    color: #E8E4DC;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    padding: 6px 14px;
+    border-radius: 6px;
+  }
+  #console-output {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #E8E4DC;
+    white-space: pre-wrap;
+    word-break: break-word;
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .output-line { display: block; }
+  .output-prompt { color: #6B9EFF; }
+  .output-result { color: #6ECC8E; }
+  .output-error  { color: #FF7B72; }
+  .output-info   { color: #7A7670; }
+
+  /* ── VARIABLE PICKER ── */
+  .var-picker {
+    position: absolute;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    z-index: 500;
+    min-width: 160px;
+    overflow: hidden;
+    animation: slideIn 0.12s ease;
+  }
+  .var-picker-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    padding: 8px 12px 4px;
+  }
+  .var-picker-item {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    cursor: pointer;
+    border-top: 1px solid var(--border);
+  }
+  .var-picker-item:active { background: var(--accent-light); }
+  .var-picker-empty {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ── INPUT MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 24px 20px 32px;
+    width: 100%;
+    max-width: 600px;
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  .modal-label {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .modal-input {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-family: 'DM Mono', monospace;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    color: var(--text);
+    transition: border-color 0.15s;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 15px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+  }
+
+  /* ── HELP PANEL ── */
+  .help-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .help-overlay.visible { display: flex; }
+  .help-panel {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 24px 20px 40px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.2s ease;
+  }
+  .help-panel h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .help-close {
+    background: var(--surface2);
+    border: none;
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .help-item {
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+  }
+  .help-item h3 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .help-item p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .help-item code {
+    background: rgba(0,0,0,0.07);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  /* ── EXAMPLES STRIP ── */
+  .examples {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .examples::-webkit-scrollbar { display: none; }
+  .example-chip {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .example-chip:active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+
+  .divider-or {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    position: relative;
+    padding: 0 10px;
+  }
+  .divider-or::before, .divider-or::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider-or::before { left: 0; }
+  .divider-or::after  { right: 0; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Logica<span>Blocks</span></div>
+  <button class="help-btn" onclick="toggleHelp()">?</button>
+</header>
+
+<main>
+
+  <!-- EXAMPLES -->
+  <div>
+    <div class="section-label">Ejemplos para empezar</div>
+    <div class="examples">
+      <button class="example-chip" onclick="loadExample('saludo')">👋 Saludo</button>
+      <button class="example-chip" onclick="loadExample('ingredientes')">🍕 Ingredientes</button>
+      <button class="example-chip" onclick="loadExample('propina')">💰 Propina</button>
+      <button class="example-chip" onclick="loadExample('mayorEdad')">🪪 Mayor de edad</button>
+      <button class="example-chip" onclick="loadExample('tabla')">🔢 Tabla de multiplicar</button>
+    </div>
+  </div>
+
+  <div class="divider-or">o construí tu propio programa</div>
+
+  <!-- PALETTE -->
+  <div class="palette">
+    <div class="section-label">Agregar instrucción</div>
+    <div class="palette-grid">
+      <button class="add-btn btn-leer"    onclick="addBlock('leer')">
+        <span class="dot"></span> LEER
+      </button>
+      <button class="add-btn btn-escribir" onclick="addBlock('escribir')">
+        <span class="dot"></span> ESCRIBIR
+      </button>
+      <button class="add-btn btn-asignar"  onclick="addBlock('asignar')">
+        <span class="dot"></span> ASIGNAR
+      </button>
+      <button class="add-btn btn-si"       onclick="addBlock('si')">
+        <span class="dot"></span> SI / SINO
+      </button>
+      <button class="add-btn btn-repetir" onclick="addBlock('repetir')" style="grid-column: span 2;">
+        <span class="dot"></span> REPETIR N VECES
+      </button>
+    </div>
+  </div>
+
+  <!-- PROGRAM -->
+  <div class="program-area">
+    <div class="section-label">Mi programa</div>
+    <div id="empty-msg" class="empty-state">
+      <span class="empty-icon">📋</span>
+      <span>Todavía no hay instrucciones.<br>Elegí un ejemplo o agregá bloques arriba.</span>
+    </div>
+    <div id="blocks-list"></div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <button class="btn-clear" onclick="clearAll()">Borrar todo</button>
+    <button class="btn-run"   onclick="runProgram()">▶ Ejecutar</button>
+  </div>
+
+  <!-- CONSOLE (fullscreen) -->
+  <div class="console" id="console">
+    <div class="console-header">
+      <span class="console-title">▶ Resultado</span>
+      <div class="console-actions">
+        <button class="console-clear" onclick="clearConsole()">Limpiar</button>
+        <button class="console-close" onclick="hideConsole()">✕ Cerrar</button>
+      </div>
+    </div>
+    <div id="console-output"></div>
+  </div>
+
+</main>
+
+<!-- INPUT MODAL -->
+<div class="modal-overlay" id="input-modal">
+  <div class="modal">
+    <div class="modal-label" id="modal-label">Ingresá un valor:</div>
+    <input type="text" class="modal-input" id="modal-input" placeholder="Escribí aquí...">
+    <button class="modal-btn" onclick="submitInput()">Confirmar</button>
+  </div>
+</div>
+
+<!-- VARIABLE PICKER -->
+<div class="var-picker" id="var-picker" style="display:none"></div>
+<div class="help-overlay" id="help-overlay" onclick="closeHelp(event)">
+  <div class="help-panel">
+    <h2>¿Cómo funciona? <button class="help-close" onclick="toggleHelp()">✕</button></h2>
+
+    <div class="help-item" style="background:var(--accent-light)">
+      <h3 style="color:var(--block-leer)">📥 LEER</h3>
+      <p>Pide al usuario que ingrese un dato y lo guarda en una variable.<br>
+      Ej: variable <code>nombre</code> → el usuario escribe "María"</p>
+    </div>
+    <div class="help-item" style="background:var(--green-light)">
+      <h3 style="color:var(--block-escribir)">📤 ESCRIBIR</h3>
+      <p>Muestra un mensaje o el valor de una variable.<br>
+      Usá <code>{nombre}</code> para mostrar el contenido de una variable.<br>
+      Ej: <code>Hola, {nombre}!</code></p>
+    </div>
+    <div class="help-item" style="background:var(--amber-light)">
+      <h3 style="color:var(--block-asignar)">🔢 ASIGNAR</h3>
+      <p>Guarda un cálculo o valor en una variable.<br>
+      Podés hacer sumas, restas, multiplicaciones y divisiones.<br>
+      Ej: variable <code>total</code> = <code>{precio} * {cantidad}</code></p>
+    </div>
+    <div class="help-item" style="background:var(--purple-light)">
+      <h3 style="color:var(--block-si)">🔀 SI / SINO</h3>
+      <p>Toma una decisión según una condición.<br>
+      Usá <code>&gt;</code> <code>&lt;</code> <code>=</code> para comparar.<br>
+      Ej: SI <code>{edad} >= 18</code> → ENTONCES escribir "Sos mayor de edad"</p>
+    </div>
+    <div class="help-item" style="background:var(--teal-light)">
+      <h3 style="color:var(--block-repetir)">🔄 REPETIR</h3>
+      <p>Repite una acción N veces.<br>
+      Usá <code>{i}</code> para indicar el número de repetición actual.<br>
+      Ej: 3 veces → <code>{i} x 5 = {i*5}</code></p>
+    </div>
+
+    <p style="font-size:13px; color:var(--text-muted); margin-top:14px; line-height:1.6;">
+      💡 <strong>Tip:</strong> Cuando escribís <code>{</code> en cualquier campo, aparece un menú para elegir una variable ya creada — sin tener que escribirla a mano.
+    </p>
+  </div>
+</div>
+
+<script>
+// ────────────────────────────────────────────────────────────
+// STATE
+// ────────────────────────────────────────────────────────────
+let blocks = [];
+let blockIdCounter = 0;
+
+// ────────────────────────────────────────────────────────────
+// BLOCK TEMPLATES
+// ────────────────────────────────────────────────────────────
+const blockTemplates = {
+  leer: () => ({
+    type: 'leer',
+    variable: '',
+    prompt: ''
+  }),
+  escribir: () => ({
+    type: 'escribir',
+    message: ''
+  }),
+  asignar: () => ({
+    type: 'asignar',
+    variable: '',
+    expression: ''
+  }),
+  si: () => ({
+    type: 'si',
+    condition: '',
+    thenMsg: '',
+    elseMsg: ''
+  }),
+  repetir: () => ({
+    type: 'repetir',
+    times: '',
+    body: ''
+  })
+};
+
+const blockNames = {
+  leer: '📥 LEER',
+  escribir: '📤 ESCRIBIR',
+  asignar: '🔢 ASIGNAR',
+  si: '🔀 SI / SINO',
+  repetir: '🔄 REPETIR'
+};
+
+// ────────────────────────────────────────────────────────────
+// ADD / REMOVE / MOVE
+// ────────────────────────────────────────────────────────────
+function addBlock(type) {
+  const block = { id: ++blockIdCounter, ...blockTemplates[type]() };
+  blocks.push(block);
+  renderBlocks();
+  // scroll to bottom
+  setTimeout(() => {
+    document.getElementById('blocks-list').lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+}
+
+function removeBlock(id) {
+  blocks = blocks.filter(b => b.id !== id);
+  renderBlocks();
+}
+
+function moveBlock(id, dir) {
+  const idx = blocks.findIndex(b => b.id === id);
+  if (idx < 0) return;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= blocks.length) return;
+  [blocks[idx], blocks[newIdx]] = [blocks[newIdx], blocks[idx]];
+  renderBlocks();
+}
+
+function clearAll() {
+  if (blocks.length === 0) return;
+  blocks = [];
+  renderBlocks();
+  hideConsole();
+}
+
+// ────────────────────────────────────────────────────────────
+// RENDER
+// ────────────────────────────────────────────────────────────
+function renderBlocks() {
+  const list = document.getElementById('blocks-list');
+  const empty = document.getElementById('empty-msg');
+
+  if (blocks.length === 0) {
+    empty.style.display = 'flex';
+    list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = blocks.map(b => renderBlock(b)).join('');
+
+  // Attach field listeners + variable picker trigger
+  list.querySelectorAll('[data-field]').forEach(el => {
+    el.addEventListener('input', () => {
+      const id = parseInt(el.closest('.block').dataset.id);
+      const field = el.dataset.field;
+      const block = blocks.find(b => b.id === id);
+      if (block) block[field] = el.value;
+    });
+
+    // Show picker when user types {
+    el.addEventListener('keyup', (e) => {
+      const val = el.value;
+      const pos = el.selectionStart;
+      // Find the last { before cursor without a matching }
+      const before = val.slice(0, pos);
+      const lastOpen = before.lastIndexOf('{');
+      if (lastOpen !== -1 && !before.slice(lastOpen).includes('}')) {
+        showVarPicker(el, lastOpen);
+      } else {
+        hideVarPicker();
+      }
+    });
+
+    el.addEventListener('blur', () => {
+      setTimeout(hideVarPicker, 150);
+    });
+  });
+}
+
+// ────────────────────────────────────────────────────────────
+// VARIABLE PICKER
+// ────────────────────────────────────────────────────────────
+function getDefinedVars() {
+  const vars = [];
+  for (const b of blocks) {
+    if (b.type === 'leer' && b.variable.trim()) vars.push(b.variable.trim());
+    if (b.type === 'asignar' && b.variable.trim()) vars.push(b.variable.trim());
+  }
+  // deduplicate, keep order
+  return [...new Set(vars)];
+}
+
+function showVarPicker(inputEl, openBraceIdx) {
+  const picker = document.getElementById('var-picker');
+  const vars = getDefinedVars();
+
+  // Position below the input
+  const rect = inputEl.getBoundingClientRect();
+  picker.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+  picker.style.left = rect.left + 'px';
+  picker.style.display = 'block';
+
+  if (vars.length === 0) {
+    picker.innerHTML = `<div class="var-picker-title">Variables</div><div class="var-picker-empty">No hay variables aún</div>`;
+    return;
+  }
+
+  picker.innerHTML = `<div class="var-picker-title">Insertar variable</div>` +
+    vars.map(v =>
+      `<button class="var-picker-item" onmousedown="insertVar(event,'${v}')" data-var="${v}">{${v}}</button>`
+    ).join('');
+
+  // Store reference to current input
+  picker._targetInput = inputEl;
+  picker._openBraceIdx = openBraceIdx;
+}
+
+function hideVarPicker() {
+  const picker = document.getElementById('var-picker');
+  picker.style.display = 'none';
+  picker._targetInput = null;
+}
+
+function insertVar(e, varName) {
+  e.preventDefault();
+  const picker = document.getElementById('var-picker');
+  const el = picker._targetInput;
+  if (!el) return;
+
+  const val = el.value;
+  const pos = el.selectionStart;
+  const openIdx = picker._openBraceIdx;
+
+  // Replace from { to cursor with {varName}
+  const newVal = val.slice(0, openIdx) + '{' + varName + '}' + val.slice(pos);
+  el.value = newVal;
+  el.dispatchEvent(new Event('input'));
+
+  const newPos = openIdx + varName.length + 2;
+  el.setSelectionRange(newPos, newPos);
+  el.focus();
+  hideVarPicker();
+}
+
+// Close picker on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#var-picker') && !e.target.closest('[data-field]')) {
+    hideVarPicker();
+  }
+});
+
+function renderBlock(b) {
+  const up   = b.id === blocks[0].id ? 'style="opacity:.3;pointer-events:none"' : '';
+  const down = b.id === blocks[blocks.length-1].id ? 'style="opacity:.3;pointer-events:none"' : '';
+
+  const header = `
+    <div class="block-header">
+      <span class="block-title">${blockNames[b.type]}</span>
+      <div class="block-actions">
+        <button class="block-action-btn" onclick="moveBlock(${b.id},-1)" ${up}>↑</button>
+        <button class="block-action-btn" onclick="moveBlock(${b.id},1)"  ${down}>↓</button>
+        <button class="block-action-btn" onclick="removeBlock(${b.id})">✕</button>
+      </div>
+    </div>`;
+
+  let body = '';
+  if (b.type === 'leer') {
+    body = `
+      <div class="field-row">
+        <span class="field-label">Variable:</span>
+        <input class="field-input" data-field="variable" value="${esc(b.variable)}" placeholder="ej: nombre">
+      </div>
+      <div class="field-row">
+        <span class="field-label">Pregunta:</span>
+        <input class="field-input" data-field="prompt" value="${esc(b.prompt)}" placeholder="ej: ¿Cuál es tu nombre?">
+      </div>`;
+  } else if (b.type === 'escribir') {
+    body = `
+      <div class="field-row">
+        <span class="field-label">Mensaje:</span>
+        <input class="field-input" data-field="message" value="${esc(b.message)}" placeholder="ej: Hola, {nombre}!">
+      </div>`;
+  } else if (b.type === 'asignar') {
+    body = `
+      <div class="field-row">
+        <span class="field-label">Variable:</span>
+        <input class="field-input" data-field="variable" value="${esc(b.variable)}" placeholder="ej: total">
+      </div>
+      <div class="field-row">
+        <span class="field-label">Valor / Cálculo:</span>
+        <input class="field-input" data-field="expression" value="${esc(b.expression)}" placeholder="ej: {precio} * {cantidad}">
+      </div>`;
+  } else if (b.type === 'si') {
+    body = `
+      <div class="field-row">
+        <span class="field-label">Condición:</span>
+        <input class="field-input" data-field="condition" value="${esc(b.condition)}" placeholder="ej: {edad} >= 18">
+      </div>
+      <div class="si-then-label">↳ Entonces:</div>
+      <div class="field-row">
+        <input class="field-input" data-field="thenMsg" value="${esc(b.thenMsg)}" placeholder="ej: Sos mayor de edad">
+      </div>
+      <div class="si-then-label" style="color:var(--text-muted)">↳ Sino:</div>
+      <div class="field-row">
+        <input class="field-input" data-field="elseMsg" value="${esc(b.elseMsg)}" placeholder="ej: Sos menor de edad (opcional)">
+      </div>`;
+  } else if (b.type === 'repetir') {
+    body = `
+      <div class="field-row">
+        <span class="field-label">Repetir:</span>
+        <input class="field-input" data-field="times" value="${esc(b.times)}" placeholder="ej: 5  o  {n}" style="max-width:80px">
+        <span class="field-label">veces</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Escribir:</span>
+        <input class="field-input" data-field="body" value="${esc(b.body)}" placeholder="ej: {i} x 3 = {i*3}">
+      </div>`;
+  }
+
+  return `<div class="block block-${b.type}" data-id="${b.id}">${header}<div class="block-body">${body}</div></div>`;
+}
+
+function esc(s) {
+  return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ────────────────────────────────────────────────────────────
+// EXECUTOR
+// ────────────────────────────────────────────────────────────
+let consoleLines = [];
+let inputQueue = [];
+let resolveInput = null;
+
+function showConsole() {
+  document.getElementById('console').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function hideConsole() {
+  document.getElementById('console').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+function clearConsole() {
+  document.getElementById('console-output').innerHTML = '';
+  consoleLines = [];
+}
+
+function printLine(text, type='result') {
+  const out = document.getElementById('console-output');
+  const span = document.createElement('span');
+  span.className = `output-line output-${type}`;
+  span.textContent = text;
+  out.appendChild(span);
+  out.appendChild(document.createElement('br'));
+  out.scrollTop = out.scrollHeight;
+}
+
+function requestInput(label) {
+  return new Promise(resolve => {
+    resolveInput = resolve;
+    document.getElementById('modal-label').textContent = label || 'Ingresá un valor:';
+    document.getElementById('modal-input').value = '';
+    document.getElementById('input-modal').classList.add('visible');
+    setTimeout(() => document.getElementById('modal-input').focus(), 100);
+  });
+}
+
+function submitInput() {
+  const val = document.getElementById('modal-input').value;
+  document.getElementById('input-modal').classList.remove('visible');
+  if (resolveInput) {
+    resolveInput(val);
+    resolveInput = null;
+  }
+}
+
+document.getElementById('modal-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitInput();
+});
+
+// Evaluate expression with variable context
+function evalExpr(expr, vars) {
+  // Replace {varname} with values
+  let resolved = expr.replace(/\{([^}]+)\}/g, (_, key) => {
+    const trimmed = key.trim();
+    // Check if it's a complex expression like i*3
+    return resolveSubExpr(trimmed, vars);
+  });
+  return resolved;
+}
+
+function resolveSubExpr(expr, vars) {
+  // Replace variable names with values
+  let e = expr;
+  Object.keys(vars).sort((a,b) => b.length - a.length).forEach(k => {
+    const safeKey = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    e = e.replace(new RegExp('\\b' + safeKey + '\\b', 'g'), String(vars[k]));
+  });
+  // Try to evaluate as math
+  try {
+    const result = Function('"use strict"; return (' + e + ')')();
+    if (result !== undefined && !isNaN(result)) return String(result);
+    return String(result);
+  } catch {
+    return e;
+  }
+}
+
+function evalCondition(cond, vars) {
+  // Replace {var} references
+  let resolved = cond.replace(/\{([^}]+)\}/g, (_, key) => {
+    const trimmed = key.trim();
+    const val = vars[trimmed];
+    if (val === undefined) return '0';
+    // quote strings that aren't numeric
+    if (isNaN(Number(val))) return JSON.stringify(String(val));
+    return String(val);
+  });
+  // Also replace bare variable names
+  Object.keys(vars).sort((a,b) => b.length - a.length).forEach(k => {
+    const safeKey = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const val = vars[k];
+    const replacement = isNaN(Number(val)) ? JSON.stringify(String(val)) : String(val);
+    resolved = resolved.replace(new RegExp('\\b' + safeKey + '\\b', 'g'), replacement);
+  });
+  // Normalize = to == (for simple comparisons)
+  resolved = resolved.replace(/([^=!<>])=([^=])/g, '$1==$2');
+  try {
+    return Function('"use strict"; return (' + resolved + ')')();
+  } catch {
+    return false;
+  }
+}
+
+async function runProgram() {
+  if (blocks.length === 0) {
+    printLine('⚠ Primero agregá algunas instrucciones.', 'error');
+    showConsole();
+    return;
+  }
+  clearConsole();
+  showConsole();
+  printLine('— Ejecutando programa —', 'info');
+
+  const vars = {};
+
+  for (const block of blocks) {
+    try {
+      if (block.type === 'leer') {
+        if (!block.variable.trim()) { printLine('⚠ Bloque LEER sin nombre de variable.', 'error'); continue; }
+        const question = block.prompt.trim() || `Ingresá un valor para "${block.variable}":`;
+        printLine(`📥 ${question}`, 'prompt');
+        const val = await requestInput(question);
+        vars[block.variable.trim()] = isNaN(Number(val)) ? val : Number(val);
+        printLine(`   → ${block.variable} = ${val}`, 'info');
+
+      } else if (block.type === 'escribir') {
+        const msg = evalExpr(block.message, vars);
+        printLine('📤 ' + msg, 'result');
+
+      } else if (block.type === 'asignar') {
+        if (!block.variable.trim() || !block.expression.trim()) { printLine('⚠ Bloque ASIGNAR incompleto.', 'error'); continue; }
+        const val = resolveSubExpr(block.expression.replace(/\{([^}]+)\}/g, (_,k)=>String(vars[k.trim()]??k)), vars);
+        const numVal = isNaN(Number(val)) ? val : Number(val);
+        vars[block.variable.trim()] = numVal;
+        // silencioso — no imprime en consola
+
+      } else if (block.type === 'si') {
+        if (!block.condition.trim()) { printLine('⚠ Bloque SI sin condición.', 'error'); continue; }
+        const result = evalCondition(block.condition, vars);
+        if (result) {
+          if (block.thenMsg.trim()) printLine('✅ ' + evalExpr(block.thenMsg, vars), 'result');
+        } else {
+          if (block.elseMsg.trim()) printLine('↩️  ' + evalExpr(block.elseMsg, vars), 'result');
+          else printLine('↩️  (condición falsa)', 'info');
+        }
+
+      } else if (block.type === 'repetir') {
+        if (!block.times.trim() || !block.body.trim()) { printLine('⚠ Bloque REPETIR incompleto.', 'error'); continue; }
+        const timesRaw = evalExpr(block.times, vars);
+        const n = parseInt(timesRaw);
+        if (isNaN(n) || n < 1 || n > 100) { printLine('⚠ REPETIR: el número de veces debe ser entre 1 y 100.', 'error'); continue; }
+        for (let i = 1; i <= n; i++) {
+          const loopVars = { ...vars, i };
+          const line = evalExpr(block.body, loopVars);
+          printLine('🔄 ' + line, 'result');
+        }
+      }
+    } catch (err) {
+      printLine('⚠ Error en bloque: ' + err.message, 'error');
+    }
+  }
+  printLine('— Fin —', 'info');
+}
+
+// ────────────────────────────────────────────────────────────
+// EXAMPLES
+// ────────────────────────────────────────────────────────────
+const examples = {
+  saludo: [
+    { type: 'leer',     variable: 'nombre',   prompt: '¿Cuál es tu nombre?' },
+    { type: 'escribir', message: 'Hola, {nombre}! Bienvenido/a.' },
+    { type: 'escribir', message: 'Espero que tengas un gran día.' }
+  ],
+  ingredientes: [
+    { type: 'leer',     variable: 'personas', prompt: '¿Para cuántas personas cocinás?' },
+    { type: 'asignar',  variable: 'harina',   expression: '{personas} * 100' },
+    { type: 'asignar',  variable: 'huevos',   expression: '{personas} * 2' },
+    { type: 'escribir', message: 'Para {personas} personas necesitás:' },
+    { type: 'escribir', message: '  Harina: {harina} gramos' },
+    { type: 'escribir', message: '  Huevos: {huevos} unidades' }
+  ],
+  propina: [
+    { type: 'leer',     variable: 'total',    prompt: '¿Cuánto salió la cuenta?' },
+    { type: 'leer',     variable: 'porcentaje', prompt: '¿Qué % de propina querés dejar? (ej: 10)' },
+    { type: 'asignar',  variable: 'propina',  expression: '{total} * {porcentaje} / 100' },
+    { type: 'asignar',  variable: 'final',    expression: '{total} + {propina}' },
+    { type: 'escribir', message: 'Propina ({porcentaje}%): ${propina}' },
+    { type: 'escribir', message: 'Total a pagar: ${final}' }
+  ],
+  mayorEdad: [
+    { type: 'leer',     variable: 'edad',     prompt: '¿Cuántos años tenés?' },
+    { type: 'si',       condition: '{edad} >= 18', thenMsg: 'Sos mayor de edad ✅', elseMsg: 'Sos menor de edad ❌' }
+  ],
+  tabla: [
+    { type: 'leer',     variable: 'n',        prompt: '¿De qué número querés la tabla?' },
+    { type: 'repetir',  times: '10',          body: '{i} × {n} = {i*n}' }
+  ]
+};
+
+function loadExample(name) {
+  const data = examples[name];
+  if (!data) return;
+  blocks = data.map(d => ({ id: ++blockIdCounter, ...d }));
+  renderBlocks();
+  hideConsole();
+  document.getElementById('blocks-list').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ────────────────────────────────────────────────────────────
+// HELP
+// ────────────────────────────────────────────────────────────
+function toggleHelp() {
+  document.getElementById('help-overlay').classList.toggle('visible');
+}
+function closeHelp(e) {
+  if (e.target.id === 'help-overlay') toggleHelp();
+}
+
+// Init
+renderBlocks();
+</script>
+</body>
+</html>
